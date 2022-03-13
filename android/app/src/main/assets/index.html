@@ -1,0 +1,552 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no,shrink-to-fit=no">
+<title>SG</title>
+
+<link href="onsenui/css/onsenui.css" rel="stylesheet">
+<link href="onsenui/css/onsen-css-components.min.css" rel="stylesheet">
+<script type="text/javascript" src="onsenui/js/onsenui.min.js"></script>
+
+<link rel="stylesheet" href="js/jquery-mobile/jquery.mobile-1.4.5.min.css" />
+<script type="text/javascript" src="js/jquery-mobile/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="js/moment.js"></script>
+
+<script type="text/javascript" src="js/lazyload/jquery.lazyload.min.js"></script>
+
+<link rel="stylesheet" href="js/chartist/chartist.min.css">
+<script type="text/javascript" src="js/chartist/chartist.min.js"></script>
+<script type="text/javascript" src="js/apexcharts/apexcharts.js"></script>
+<script type="text/javascript" src="js/gauge-chart/bundle.js"></script>
+
+<link rel="stylesheet" href="css/main.css?v=1.0.0" />
+<script type="text/javascript" src="js/function.js?v=1.1.7"></script>
+<script type="text/javascript" src="js/main.js?v=2.8.6"></script>
+
+</head>
+
+<style>
+*{
+	text-shadow:none !important;
+}
+html, body {
+	-webkit-text-size-adjust: none;
+	touch-action: manipulation;
+	background-color:#fff !important;
+	color:#000;
+}
+.w-100 { width:100% !important; }
+.bg-white { background: #fff !important; }
+.center { text-align: center !important; }
+.left { text-align: left !important; }
+.right { text-align: right !important; }
+select,input[type=text] { background:#fff !important; text-transform:uppercase; }
+select { width:100% !important; text-transform:uppercase; }
+.input-text-h{
+	height:35px;
+	line-height:35px;
+	font-size:15px;
+	font-weight:700;
+	color:#2E4F8B;
+	border:3px solid #2E4F8B;
+	border-radius:10px;
+	padding-left:5px;
+}
+.input-select-h{
+	height:40px;
+	line-height:40px;
+	font-size:15px;
+	font-weight:700;
+	color:#2E4F8B;
+	border:3px solid #2E4F8B;
+	border-radius:10px;
+	padding-left:5px;
+}
+.input-button {
+	height:40px;
+	line-height:40px;
+	font-size:16px;
+	font-weight:800;
+	color:#fff;
+	background-color: red;
+	border-radius:10px;
+	border:3px solid red;
+}
+.bg-header{
+	background-image: linear-gradient(to right, #3fa4e8, #3b8ed1, #3878ba, #3363a2, #2e4f8b);
+}
+
+.input-text-login {
+	height:35px;
+	line-height:35px;
+	font-size:15px;
+	font-weight:700;
+	color:#fff;
+	border:3px solid #fff;
+	border-radius:10px;
+	padding-left:5px;
+	background-color:rgba(1,1,1,0.3) !important; 
+}
+
+.login ::placeholder { 
+  color: #fff;
+  opacity: 1; 
+}
+
+.activation_form_col{
+	border-bottom: thin solid #ccc;
+	padding: 5px;
+}
+
+.activation_form_field{
+	border: none;
+	width: 90%;
+	margin-top: 5px;
+}
+
+.activation_form_title{
+	font-size: 17px;
+	font-weight: bolder;
+}
+
+.activation_form_label{
+	color : #666;
+	font-weight: bolder;
+}
+
+.title{
+	color:red;
+}
+
+.section{
+	margin-bottom:30px;
+}
+
+ul{
+	list-style-type:square;
+	padding-left:20px;
+}
+
+p{
+	text-align:justify;
+}
+
+</style>
+<script>
+ons.ready(function(){
+	$(".img_lazy").lazyload({
+		failure_limit : 100,
+		event: "lazyload"
+	})
+	.trigger("lazyload");
+	
+	if($('#app_agent_id').val()){
+		PAGE_HOME();
+	}else{
+		PAGE_LANDING();
+	}
+	
+	var hashtimer = setInterval(function(){
+		if(window.location.hash){
+			var rawhash = window.location.hash;
+			var hash_data = rawhash.split("=");
+			if(hash_data[0]=="#session"){
+				//alert(hash_data[1]);
+				var session_data = hash_data[1].split("+");
+				if(session_data['0'] && session_data['1']){
+					$("#app_agent_id").val(session_data["1"]);
+					$("#app_session").val(session_data["0"]);
+					$("#app_device_id").val(session_data["2"]);
+					
+					clearInterval(hashtimer);
+					PAGE_HOME();
+				}	
+			}else if(hash_data[0]=="#uuid"){
+				$("#app_device_id").val(hash_data["1"]);
+			}
+		}
+	}, 100);
+
+	load_lang_pack("EN");
+});
+
+
+
+</script>
+<body>
+<input type="hidden" id="app_device_id" value="">
+<input type="hidden" id="app_agent_id" value="">
+<input type="hidden" id="app_session" value="">
+<input type="hidden" id="app_ranking_id" value="">
+
+<ons-navigator animation="slide" class="bg-white" var="nav" id="nav">
+
+<ons-modal direction="left" id="modalMenu" style="z-index:99 !important; display:none;">
+<div class="bg-header" style="position:relative;width:80%; left:0px; height:100%; padding-bottom:20px;font-size:14px;color:#fff;font-weight:600;border-right:0.5px solid #ccc;" id="modalMenuContent">
+	<div style="height:65px;" class="right">
+		<ons-icon icon="fa-times" style="line-height:55px !important; font-size:25px;margin-right:10px;z-index: 9999999999 !important; border-radius:0px; color:#fff;" onClick="MENU_CLOSE();"></ons-icon> 
+	</div>
+	<div style="height:55px;line-height:40px;" class="bg-white" onClick="PAGE_PROFILE();">
+		<div id="menu-profile-name" class="center" style="margin-left:100px;color:#2E4F8B;font-size:16px;height:40px;word-wrap: break-word;overflow: hidden;text-overflow: ellipsis;"></div>
+		<div id="menu-profile-status" class="center" style="margin-left:100px;margin-top:-20px;font-size:12px;height:20px;"></div>
+	</div>
+	<img class="menu-profile-icon" src="" height="90" width="90" style="position:absolute;left:5px;top:10px;border-radius:50%;border:2px solid #fff;" onClick="PAGE_PROFILE();">
+	<div style="height:10px;"></div>
+	<div style="padding-left:10px;" class="left">
+		<div style="line-height:35px;position:relative;" onClick="PAGE_INBOX_LIST();">
+		<span class="lang" data-lang="my_inbox">My Inbox</span> <div class="tabbar__badge notification notification-inbox" style="display: none;"></div>
+		</div>
+		<div style="line-height:35px;position:relative;" onClick="PAGE_PRODUCTION();">
+			<span class="lang" data-lang="my_prod">My Production</span>
+		</div>
+		<div style="line-height:35px;position:relative;" onClick="PAGE_ACTIVITY_LIST();">
+			<span class="lang" data-lang="my_activities">My Activities</span> <div class="tabbar__badge notification notification-activity" style="display: none;"></div>
+		</div>
+		<div style="line-height:35px;position:relative;" onClick="PAGE_PROFILE();">
+			<span class="lang" data-lang="my_profile">My Profile</span>
+		</div>
+		<div style="line-height:35px;position:relative;" onClick="PAGE_CHANGE_PASSWORD();">
+			<span class="lang" data-lang="change_password">Change Password</span>
+		</div>
+		<div style="line-height:35px;position:relative;display:none;" onClick="PAGE_LANGUAGE();">
+			<span class="lang" data-lang="change_password">Change Language</span>
+		</div>
+		<div style="line-height:35px;position:relative;" onClick="PAGE_LOGOUT();">
+			<span class="lang" data-lang="sign_out">Sign Out</span>
+		</div>
+		<div style="height:20px;border-bottom:0px solid #eee"></div>
+		<div style="line-height:35px;position:relative;" onClick="PAGE_ABOUT_SG();">
+			<span class="lang" data-lang="about_sg">About SG</span>
+		</div>
+		<div style="line-height:35px;position:relative;" onClick="PAGE_WHY_SG();">
+			<span class="lang" data-lang="why_sg">Why SG</span>
+		</div>
+		<div style="line-height:35px;position:relative;" onClick="PAGE_SG_NETWORK();">
+			<span class="lang" data-lang="sg_network">SG Network</span>
+		</div>
+		<div style="line-height:35px;position:relative;" onClick="PAGE_REFUND_POLICY();">
+			<span class="lang" data-lang="refund_policy">Refund Policy</span>
+		</div>
+		<div style="line-height:40px;color:#fff;font-size:10px;">v.21.03.01.01</div>
+	</div>
+</div>
+</ons-modal>
+
+<ons-modal direction="up" id="modalLoading" style="z-index:999999999 !important; background-color:transparent !important;">
+<div style="width:100%; padding-top:0%;">
+<center>
+<div style="width:110px; background-color:#666 !important; padding:15px;border-radius:6px;">
+<ons-icon size="40px" icon="fa-spinner" spin style="color:#fff !important;"></ons-icon>
+<div style="font-size:15px; margin-top:15px;color:#fff "><span class="lang" data-lang="loading_page"></span></div>
+</div>
+</center>
+</div>
+</ons-modal>
+
+<ons-modal direction="up" id="modalAlert" style="z-index:999999999 !important; display:none;" onClick="$('#modalAlert').hide();">
+<div style="padding-bottom:5%;">
+    <center>
+    <div class="bg-white left" style="position:relative;width:80%; color:#333; min-height:100px; border-radius:5px;padding:10px;padding-bottom:0px;">
+    	<div  id="modalAlertContent"></div>
+    	<div class="w-100 center" style="line-height:60px;">Close</div>
+    </div>
+    </center>
+</div>
+</ons-modal>
+
+
+
+</ons-navigator>
+
+
+
+
+
+<template id="landing.html">
+<ons-page>
+    <ons-carousel fullscreen swipeable auto-scroll id="carousel">
+		<ons-carousel-item style="background:url('images/cny.jpg');background-size:cover;background-position:center top;">
+      		<div class="w-100 center landing-div">
+      			<div style="position:absolute;bottom:3%;left:0px;" class="w-100">
+      				<center>
+						  <div style="width:150px;border:3px solid #fff;border-radius:8px;background-color:transparent;line-height:40px;font-size:14px;font-weight:700;color:#fff;" onClick="PAGE_LOGIN();"><span data-lang="proceed" class="lang">PROCEED</span></div>
+						  <div style="color: white; margin-top: 5px;"><small>v.20.10.01.05</small></div>
+					</center>
+      			</div>
+      		</div>
+    	</ons-carousel-item>
+	</ons-carousel>
+</ons-page>  	
+</script>
+</template>
+
+
+
+
+
+<template id="login.html">
+<ons-page>
+<ons-row fullscreen style="padding-top:6%;color:#000;background:url('banner/login-cover.jpg');background-size:100% 100%;min-height:100%;background-position:top center;">
+    <ons-col width="100%">
+        <form id="form_login">
+        	<div class="w-100 center login" style="margin-top:63%;margin-bottom:15px;"><input type="number" id="login_agent_no" name="agent_no" class="input-text-login center" style="width:250px;" autocomplete="no" placeholder="Agent ID &nbsp;" maxlength="7" /><div>
+            <div class="w-100 center login" style="margin-top:15px;margin-bottom:15px;"><input type="password" id="login_password" name="password" class="input-text-login center" style="width:250px;" placeholder="Password" /><div>
+            <div class="w-100" style="margin-top:15px;margin-bottom:20px;">
+            	<input type="hidden" id="device_id" name="device_id" value="" />
+                <center><div class="input-button" style="width:260px;" onClick="LOGIN_SUBMIT();"><span class="lang" data-lang="login">LOGIN</span></div></center>
+            <div>
+        </form>
+		<div class="center" style="margin-top:20px;margin-bottom:5px;line-height:30px;font-size:18px;color:#fff;text-shadow: 2px 2px 2px #000 !important;" onClick="PAGE_FORGET_PASSWORD();">
+			<span class="lang" style="font-size:18px;color:#fff;text-shadow: 2px 2px 2px #000 !important;" data-lang="forgot_password">Forget Password</span>
+		</div>
+		<div class="center" style="margin-top:10px;margin-bottom:5px;line-height:30px;font-size:18px;color:#fff;text-shadow: 2px 2px 2px #000 !important;" onClick="PAGE_NEW_AGENT_ACTIVATION();">
+			<span class="lang" style="font-size:18px;color:#fff;text-shadow: 2px 2px 2px #000 !important;" data-lang="new_agent_reg">New Agent Registration</span>
+		</div>
+		<div class="center" style="margin-top:10px;margin-bottom:5px;line-height:30px;font-size:18px;color:#fff;text-shadow: 2px 2px 2px #000 !important;" onClick="PAGE_OLD_AGENT_ACTIVATION();">
+			<span class="lang" style="font-size:18px;color:#fff;text-shadow: 2px 2px 2px #000 !important;" data-lang="first_time_login">First Time Log In</span>
+		</div>
+    </ons-col>
+</ons-row>
+<div style="position:absolute;bottom:0px;right:0px;z-index:9999999999999999 !important;color:#fff;font-size:9px;">v.20.10.01.05</div>
+<script>
+$(function(){
+	$("#login_agent_no").on("keypress", function(e){
+		var agent_no = $(this).val();
+
+		if(agent_no.length > 6){
+			return false;
+		}
+
+		if(e.keyCode < 48 || e.keyCode > 57){
+			return false;
+		}
+	});
+
+	$("#device_id").val($("#app_device_id").val());
+	//console.log($("#device_id").val());
+	
+	$("#form_login").on("submit", function(e){
+		e.preventDefault();
+
+		var agent_no = $("#login_agent_no").val();
+		var password = $("#login_password").val();
+		
+		if(agent_no && password){
+			$("#modalLoading").show();
+			
+			var formdata = new FormData(this);
+
+			$.ajax({
+				url: "https://supergroup-app.trip4asia.com/api/agent/login.php",
+				method: "POST",
+				data: formdata,
+				contentType: false,
+				processData: false,
+				cache: false,
+				success: function(json){
+					if(json){
+						$("#modalLoading").hide();
+						var data = $.parseJSON(json);
+					
+						if(data["status"] == "success"){		
+							$("#app_agent_id").val(data["data"]["agent_id"]);
+							$("#app_session").val(data["data"]["session"]);
+							$("#app_ranking_id").val(data["data"]["ranking_id"]);
+						
+							if(window.parent.ReactNativeWebView){
+								window.parent.ReactNativeWebView.postMessage(JSON.stringify({
+									action: "session="+data["data"]["session"]+'+'+data["data"]["agent_id"]
+								}));
+							}
+							
+							PAGE_HOME();
+						}else{
+							ons.notification.alert("Invalid agent ID and Password. If you are first time user, please select New Agent Registration or First Time Log in to proceed .");
+						}
+					}else{
+						PAGE_LOGIN();
+					}
+				}
+			});		
+		}
+	});
+});
+
+function LOGIN_SUBMIT(){
+	$("#form_login").submit();
+}
+
+</script>
+</ons-page>
+</template>
+
+<template id="home.html">
+<ons-page>
+<div class="bg-header page-header" style="position:fixed;height:60px !important; width:100%; top:0px; left:0px; z-index:999999;">
+	<ons-row style="color:#fff;text-shadow: 2px 2px 4px #ddd;" class="left">
+    	<ons-col width="20%" style="line-height:60px;" class="page-left-home">
+    		<i class="fas fa-list" style="display:none;position:absolute;top:0px;left:10px; line-height:60px !important; font-size:28px;z-index: 9999999999 !important; border-radius:0px; color:#fff;" onClick="MENU_OPEN();"></i>
+    	</ons-col>  
+		<ons-col class="center" width="60%" style="line-height:60px !important; font-size:20px;font-weight:600;">
+			<span class="lang" data-lang="super_group">SUPER GROUP</span>
+		</ons-col>
+    	<ons-col width="20%" style="line-height:60px;position:relative;" class="page-right-home">
+    		<i class="far fa-bell" style="position:absolute;top:0px;right:10px; line-height:60px !important; font-size:33px;z-index: 9999999999 !important; border-radius:0px; color:#fff;" onClick="PAGE_INBOX_LIST();"></i>
+    		<span class="center notification-inbox" style="position:absolute;top:3px;right:2px;z-index:99999999999;background:red;color:#fff;font-weight:900;font-size:11px;border-radius:50%;line-height:16px;width:16px;height:16px;display:none;"></span>
+    	</ons-col>   
+    </ons-row>
+</div>
+<div class="pageContent bg-white side-border w-100" style="position:absolute;top:0px;left:0px;min-height:100%;" id="resultContent-home">
+	
+<ons-row style="padding-top:68px;color:#2E4F8B;font-size:12px;font-weight:400;padding-left:1%;padding-right:1%;">
+    <ons-col width="25%" class="center" onClick="PAGE_BULLENTIN_LIST();">
+        <div style="position:relative;">
+            <div style="height:3px;"></div>
+			<img src="images/icon-Bulletin.png" height="40">
+			<span class="center notification-bulletin" style="position:absolute;top:0px;right:24%;z-index:999;background:red;color:#fff;font-weight:900;font-size:12px;border-radius:50%;line-height:18px;width:18px;height:18px;display:none;"></span>
+            <div style="height:3px;"></div>
+        </div>
+        <div><span class="lang" data-lang="bulletin">Bulletin</span></div>
+    </ons-col>
+    <ons-col width="25%" class="center" onClick="PAGE_PRODUCTION();">
+        <div>
+            <div style="height:3px;"></div>
+            <img src="images/icon-FYC.png" height="40">
+            <div style="height:3px;"></div>
+        </div>
+        <div><span class="lang" data-lang="my_prod">My Prod</span></div>
+    </ons-col>
+    <ons-col width="25%" class="center" onClick="PAGE_APPLICATION_LIST();">
+        <div style="position:relative;">
+            <div style="height:3px;"></div>
+			<img src="images/icon-Application.png" height="40">
+			<span class="center notification-application" style="position:absolute;top:0px;right:24%;z-index:999;background:red;color:#fff;font-weight:900;font-size:12px;border-radius:50%;line-height:18px;width:18px;height:18px;display:none;"></span>
+            <div style="height:3px;"></div>
+        </div>
+        <div><span class="lang" data-lang="awardees">Awardees</span></div>
+    </ons-col>
+    <ons-col width="25%" class="center" onClick="PAGE_TICKET_LIST();">
+        <div style="position:relative;">
+            <div style="height:3px;"></div>
+			<img src="images/icon-Ticket.png" height="40">
+			<span class="center notification-ticket" style="position:absolute;top:0px;right:24%;z-index:999;background:red;color:#fff;font-weight:900;font-size:12px;border-radius:50%;line-height:18px;width:18px;height:18px;display:none;"></span>
+        	<div style="height:3px;"></div>
+        </div>
+        <div><span class="lang" data-lang="my_ticket">My Ticket</span></div>
+    </ons-col>
+</ons-row>
+
+<ons-row style="padding:5px;color:#2E4F8B;font-size:15px;font-weight:600;margin-top:1px;">
+    <ons-col width="100%" style="padding-top:1px;overflow-x:scroll;height:140px;" id="homepage-banner-div">
+        
+    </ons-col>
+</ons-row>
+
+<ons-row style="padding:5px;padding-top:1px;color:#2E4F8B;font-size:16px;font-weight:700;">
+    <ons-col width="100%"><span class="lang" data-lang="highlight_event">Highlight Events</span></ons-col>
+    <ons-col width="100%" style="padding-top:5px;overflow-x:scroll;position:relative;height:200px;" id="homepage-event-div">
+        
+    </ons-col>
+</ons-row>
+
+<ons-row style="padding:5px;padding-top:1px;color:#2E4F8B;font-size:16px;font-weight:700;">
+    <ons-col width="100%"><span class="lang" data-lang="highlight_course">Highlight Courses</span></ons-col>
+    <ons-col width="100%" style="padding-top:5px;overflow-x:scroll;position:relative;height:200px;" id="homepage-course-div">
+        
+    </ons-col>
+</ons-row>
+
+</div>
+</ons-page>
+</template>
+
+
+
+
+
+<template id="forget-password.html">
+<ons-page>
+<div class="bg-header page-header" style="position:fixed;height:60px !important; width:100%; top:0px; left:0px; z-index:999999;">
+	<ons-row style="color:#fff;text-shadow: 2px 2px 4px #ddd;" class="left">
+    	<ons-col width="20%" style="line-height:60px;">
+    		<ons-icon icon="fa-chevron-left" style="position:absolute; left:15px; line-height:60px !important; font-size:30px;z-index: 9999999999 !important; border-radius:0px; color:#fff;" onClick="onsen_pop_page();"></ons-icon>
+    	</ons-col>  
+		<ons-col class="center" width="60%" style="line-height:60px !important; font-size:20px;font-weight:600;">
+			<span class="lang" data-lang="forgot_password">Forget Password</span>
+		</ons-col>
+    	<ons-col width="20%" style="line-height:60px;">
+    		
+    	</ons-col>   
+    </ons-row>
+</div>
+<div class="pageContent bg-white side-border w-100" style="position:absolute; margin:0px; padding:0px; top:0px; left:0px; min-height:99%; margin-top:60px;" id="resultContent-forget-password">
+
+<ons-row style="padding:10px;color:#000;font-size:14px;margin-top:0px;">
+    <ons-col width="100%">
+    	<form id="form_forgot_password">
+        	<div class="w-100 center login" style="margin-top:15px;margin-bottom:15px;">
+        		<img src="images/main-logo.png" height="130">
+        	<div>
+			<div style="margin: 10px 0px;">
+                <div class="form_title"><span class="lang" data-lang="reset_password">Reset Password</span></div>
+                <small><span class="lang" data-lang="reset_password_ins">Please enter your Agent ID to reset your password.</span></small>
+			</div>
+			<div class="form_col">
+                <div class="form_label"><span class="lang" data-lang="agent_id">Agent ID</span></div>
+                <input type="text" id="reset_password_agent_id" name="agent_no" class="form_field" maxlength="50" />
+            </div>
+        	
+            <div class="w-100" style="margin-top:15px;margin-bottom:15px;">
+                <input type="hidden" id="reset_password_device_id" name="device_id" value="" />
+                <center><div onclick="FORGOT_PASSWORD_SUBMIT();" class="input-button" style="width:256px;"><span class="lang" data-lang="proceed">Proceed</span></div></center>
+            <div> 
+            
+        </form>
+    </ons-col>
+</ons-row>
+
+</div>
+<script>
+function FORGOT_PASSWORD_SUBMIT(){
+	$("#form_forgot_password").submit();
+}
+
+$(function(){
+	$("#reset_password_device_id").val($("#app_device_id").val());
+	
+	$("#form_forgot_password").on("submit", function(e){
+		e.preventDefault();
+		
+		var agent_no = $("#reset_password_agent_id").val();	
+	
+		if(agent_no){
+			$("#modalLoading").show();
+			var formdata = new FormData(this);
+			$.ajax({
+				url: "https://supergroup-app.trip4asia.com/api/agent/forgot_password.php",
+				method: "POST",
+				data: formdata,
+				contentType: false,
+				processData: false,
+				cache: false,
+				success: function(json){
+					$("#modalLoading").hide();
+					var data = $.parseJSON(json);
+					
+					if(data["status"] == "success" || data["status"] == "already_request"){
+						ons.notification.alert("A reset password link has been sent to your registered email. Please check your email at " + data["email"] + ".");
+					}else{
+						ons.notification.alert("Your request to reset password is unsuccessful. Please ensure your agent ID is correct.");
+					}
+				}
+			});
+		}
+	});
+});
+</script>	
+</ons-page>
+</template>
+</body>
+</html>
